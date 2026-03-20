@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
+import { userStore, findUserByEmail } from "@/lib/store/users";
 
 const registerSchema = z.object({
   name: z.string().min(2).max(100),
@@ -15,19 +16,6 @@ const registerSchema = z.object({
     .regex(/[0-9]/)
     .regex(/[^A-Za-z0-9]/),
 });
-
-// In-memory store for demonstration purposes.
-// Replace with a real database (e.g., PostgreSQL via Prisma) in production.
-const users: Array<{
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  password_hash: string;
-  role: string;
-  created_at: string;
-  updated_at: string;
-}> = [];
 
 export async function POST(request: Request) {
   try {
@@ -55,9 +43,7 @@ export async function POST(request: Request) {
 
     const { name, email, phone, password } = validationResult.data;
 
-    const existingUser = users.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase()
-    );
+    const existingUser = findUserByEmail(email);
     if (existingUser) {
       return NextResponse.json(
         { success: false, message: "Email này đã được đăng ký" },
@@ -65,7 +51,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const saltRounds = 12;
+    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS ?? "12", 10);
     const password_hash = await bcrypt.hash(password, saltRounds);
 
     const now = new Date().toISOString();
@@ -80,7 +66,7 @@ export async function POST(request: Request) {
       updated_at: now,
     };
 
-    users.push(newUser);
+    userStore.push(newUser);
 
     return NextResponse.json(
       {
@@ -101,3 +87,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

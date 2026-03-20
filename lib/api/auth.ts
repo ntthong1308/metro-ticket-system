@@ -5,8 +5,11 @@ import type {
   CheckEmailResponse,
 } from "@/types/auth";
 
+// In a browser context, relative URLs resolve against the current origin,
+// so an empty string works correctly for same-origin API calls.
+// Set NEXT_PUBLIC_API_URL to a full URL when calling an external API server.
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "",
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "",
   headers: {
     "Content-Type": "application/json",
   },

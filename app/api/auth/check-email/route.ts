@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-
-// Mirrors the in-memory store from the register route.
-// In production, query the real database instead.
-const registeredEmails = new Set<string>();
+import { findUserByEmail } from "@/lib/store/users";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -23,6 +20,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ exists: false });
   }
 
-  const exists = registeredEmails.has(normalizedEmail);
+  const exists = !!findUserByEmail(normalizedEmail);
   return NextResponse.json({ exists });
 }

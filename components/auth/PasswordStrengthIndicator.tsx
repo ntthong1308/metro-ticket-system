@@ -24,11 +24,12 @@ function calculateStrength(password: string): StrengthLevel {
   if (/[0-9]/.test(password)) score++;
   if (/[^A-Za-z0-9]/.test(password)) score++;
 
+  // Map raw score (0-6) to 4 display levels
   if (score <= 2) {
     return { label: "Yếu", color: "text-red-500", bgColor: "bg-red-500", score: 1 };
-  } else if (score <= 3) {
+  } else if (score === 3) {
     return { label: "Trung bình", color: "text-yellow-500", bgColor: "bg-yellow-500", score: 2 };
-  } else if (score <= 4) {
+  } else if (score === 4) {
     return { label: "Khá", color: "text-blue-500", bgColor: "bg-blue-500", score: 3 };
   } else {
     return { label: "Mạnh", color: "text-green-500", bgColor: "bg-green-500", score: 4 };
